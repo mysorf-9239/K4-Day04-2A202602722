@@ -3,6 +3,32 @@
 Tài liệu này tập trung vào việc cài môi trường, cấu hình model provider và kiểm
 tra các tool có sẵn. Quy trình làm bài được tách riêng trong `LAB-GUIDE.md`.
 
+## 0. Quick Start (Automatic Setup)
+
+Để setup nhanh, sử dụng script tự động:
+
+**Windows PowerShell:**
+```powershell
+.\setup.ps1
+```
+
+**macOS/Linux:**
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+Script sẽ tự động:
+1. Kiểm tra Python version (yêu cầu 3.10+)
+2. Tạo virtual environment trong thư mục `starter_v0/.venv`
+3. Cài đặt tất cả dependencies từ `requirements.txt`
+4. Tạo file `.env` từ `.env.example` (không ghi đè nếu đã có)
+5. Chạy compile check để kiểm tra syntax
+6. Chạy smoke tests cho tất cả 7 core tools
+
+**Lưu ý:** Script tạo virtual environment mới mỗi lần chạy. Nếu muốn chạy lại,
+hãy xóa thư mục `.venv` trước.
+
 ## 1. Yêu cầu môi trường
 
 - Python 3.10 trở lên.
@@ -41,7 +67,7 @@ Không ghi đè `.env` đang có. Không commit hoặc chia sẻ file `.env`.
 Chọn một provider và điền key tương ứng trong `starter_v0/.env`:
 
 ```text
-# OpenRouter
+# OpenRouter (recommended)
 OPENROUTER_API_KEY=...
 
 # Hoặc OpenAI
@@ -251,6 +277,32 @@ streamlit run app.py
 
 UI nên tái sử dụng `run_model_tool_loop` từ `chat.py` để CLI, eval evidence và UI
 không dùng các agent loop khác nhau.
+
+### Streamlit UI Implementation
+
+File `app.py` đã được tạo sẵn với các tính năng:
+
+1. **Chat Interface**: Giao diện chat hiện đại với Streamlit
+2. **Tool Visualization**: Hiển thị tool calls và results một cách trực quan
+3. **Configuration Sidebar**: Cấu hình provider, model, history window, max tool rounds
+4. **Transcript Management**: Lưu và tải transcript JSON
+5. **Artifact Info**: Hiển thị thông tin version và hash của artifacts
+
+**Cách chạy UI:**
+
+```powershell
+cd starter_v0
+streamlit run app.py --server.headless true --server.port 8501
+```
+
+**Tính năng chính:**
+
+- **Load/Reload Artifacts**: Nạp lại system prompt, tools và provider
+- **Clear Chat**: Xóa lịch sử chat hiện tại
+- **Download Transcript**: Tải transcript JSON cho eval evidence
+- **Tool Call Display**: Hiển thị tool calls với JSON formatting
+- **Tool Result Display**: Hiển thị tool results với color coding
+- **Session Metrics**: Hiển thị tổng số turns, tool events và last status
 
 ## 11. Troubleshooting
 
