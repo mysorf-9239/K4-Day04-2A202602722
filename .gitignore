@@ -18,8 +18,6 @@ starter_v0/tests/
 
 # Local action/scratch output
 /starter_v0/tickets/
-/starter_v0/runs/*
-!/starter_v0/runs/v0_B_base_openai_20260914T184426691901.json
 /starter_v0/transcripts/
 /starter_v0/analysis/
 
@@ -28,5 +26,3 @@ starter_v0/tests/
 Thumbs.db
 .idea/
 .vscode/
-
-!/starter_v0/runs/v1_B_base_openai_20260914T191009421718.json
