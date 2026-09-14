@@ -1,7 +1,97 @@
 {
   "dataset_id": "day04_v3_helpdesk_group",
   "dataset_role": "group",
-  "description": "Template intentionally left empty. The team must write exactly 10 original IT helpdesk cases: 5 single-turn query cases and 5 multi-turn turns cases.",
+  "description": "Original team-authored IT helpdesk cases: 5 single-turn (S1-S5) and 5 multi-turn (M1-M5). Each case isolates exactly one branching decision. Together they cover: ambiguous intent forcing clarify, device-ID correction or a changed decision in a later turn, cancellation, and policy lookup combined with a confirmed ticket request.",
   "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "cases": [
+    {
+      "id": "S1_ambiguous_intent_forces_clarify", "phase": "B", "suite": "group",
+      "query": "Kiểm tra bảo mật máy của mình xem có vấn đề gì không nhé, cảm ơn bạn.",
+      "failure_type": "missing_info",
+      "expect": {"tool_calls": [{"name": "clarify", "args": {"response_type": "text"}}]},
+      "metadata": {"skill": "ambiguous_intent_forces_clarify", "difficulty": "easy", "what_it_tests": "Không có asset ID cũng không có employee ID trong câu. Agent phải hỏi lại bằng clarify, không được đoán bừa một thiết bị."}
+    },
+    {
+      "id": "S2_policy_plus_confirmed_ticket", "phase": "B", "suite": "group",
+      "query": "Mình xác nhận tạo ticket: máy DT-031 báo lỗi ổ cứng SMART, priority high. Tiện thể cho mình hỏi luôn, theo policy ticketing thì priority high có cần mô tả chi tiết không?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [
+        {"name": "create_ticket", "args": {"asset_id": "DT-031", "priority": "high", "confirmed": true}},
+        {"name": "policy", "args": {"policy_area": "ticketing"}}
+      ]},
+      "metadata": {"skill": "policy_lookup_plus_confirmed_ticket", "difficulty": "medium", "what_it_tests": "Message có một xác nhận tạo ticket đầy đủ và một câu hỏi policy độc lập ('tiện thể hỏi luôn'), không phải điều kiện tiên quyết của ticket. Agent phải gọi cả hai tool."}
+    },
+    {
+      "id": "S3_asset_vs_shared_service_distractor", "phase": "B", "suite": "group",
+      "query": "Máy in PR-404 bị kẹt giấy liên tục dù đã đổi khay. Dịch vụ in ấn nói chung vẫn bình thường. Xem giúp mình tình trạng phần cứng của máy in này.",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "inspect_device", "args": {"asset_id": "PR-404", "check": "hardware"}}]},
+      "metadata": {"skill": "device_vs_shared_service_distractor", "difficulty": "medium", "what_it_tests": "Câu nhắc dịch vụ in ấn nói chung như một distractor, nhưng yêu cầu thật chỉ nhắm vào một asset cụ thể (PR-404), không phải check_service_status."}
+    },
+    {
+      "id": "S4_it_symptom_pivots_out_of_scope", "phase": "B", "suite": "group",
+      "query": "Máy chạy chậm quá, có phải do phong thủy đặt bàn sai hướng không? Tư vấn cách kê bàn làm việc hợp phong thủy giúp mình.",
+      "failure_type": "out_of_scope",
+      "expect": {"no_tool": true, "behavior": "refuse"},
+      "metadata": {"skill": "it_symptom_opener_out_of_scope_pivot", "difficulty": "easy", "what_it_tests": "Câu mở đầu bằng triệu chứng IT thật nhưng yêu cầu thật sự (tư vấn phong thủy) nằm ngoài phạm vi helpdesk và không cần tool nào."}
+    },
+    {
+      "id": "S5_confirm_before_ticket_boundary", "phase": "B", "suite": "group",
+      "query": "Tạo ticket lỗi máy in PR-404 kẹt giấy liên tục, priority medium giúp mình.",
+      "failure_type": "wrong_boundary",
+      "expect": {"tool_calls": [{"name": "clarify", "args": {"response_type": "yes_no"}}]},
+      "metadata": {"skill": "confirm_write_before_create", "difficulty": "easy", "what_it_tests": "Yêu cầu tạo ticket chưa có xác nhận rõ ràng. Agent phải hỏi xác nhận trước, không được gọi create_ticket ngay."}
+    },
+    {
+      "id": "M1_device_id_correction", "phase": "B", "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Kiểm tra phần cứng máy LT-411 giúp mình."},
+        {"role": "user", "content": "À nhầm, mã đúng là LT-318."}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "inspect_device", "args": {"asset_id": "LT-318", "check": "hardware"}}]},
+      "metadata": {"skill": "device_id_correction", "difficulty": "medium", "what_it_tests": "User đính chính mã thiết bị ở turn 2. Agent phải dùng mã mới (LT-318), không dùng mã cũ LT-411."}
+    },
+    {
+      "id": "M2_full_cancellation", "phase": "B", "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Tạo ticket lỗi máy in PR-404 kẹt giấy, priority cao giúp mình."},
+        {"role": "user", "content": "Thôi khỏi, không cần tạo ticket nữa đâu."}
+      ],
+      "failure_type": "unnecessary_tool",
+      "expect": {"no_tool": true, "behavior": "answer_without_tool"},
+      "metadata": {"skill": "multiturn_cancellation", "difficulty": "medium", "what_it_tests": "User hủy yêu cầu tạo ticket trước khi có xác nhận. Agent không được gọi create_ticket và cũng không cần hỏi xác nhận thêm."}
+    },
+    {
+      "id": "M3_carry_environment_across_service_switch", "phase": "B", "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Wi-Fi staging có ổn không?"},
+        {"role": "user", "content": "Còn dịch vụ in ấn thì sao, vẫn staging đó."}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "check_service_status", "args": {"service": "printing", "environment": "staging"}}]},
+      "metadata": {"skill": "multiturn_carry_environment", "difficulty": "medium", "what_it_tests": "Environment (staging) được giữ nguyên từ turn 1 khi user đổi sang service khác (printing) ở turn 2."}
+    },
+    {
+      "id": "M4_tool_switch_mid_conversation", "phase": "B", "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Kiểm tra trạng thái dịch vụ in ấn (printing) production giúp mình."},
+        {"role": "user", "content": "Thôi khỏi xem trạng thái, tìm giúp mình hướng dẫn khắc phục máy in kẹt giấy thay vào đó."}
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "search_kb", "args": {"category": "printing"}}]},
+      "metadata": {"skill": "multiturn_switch_tool", "difficulty": "medium", "what_it_tests": "User đổi ý giữa chừng, từ hỏi trạng thái dịch vụ sang hỏi hướng dẫn khắc phục. Agent phải dùng search_kb, không phải check_service_status."}
+    },
+    {
+      "id": "M5_priority_revision_then_confirm", "phase": "B", "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Soạn ticket lỗi ổ cứng máy DT-087, priority medium."},
+        {"role": "user", "content": "Đổi priority thành critical, ổ cứng có vẻ sắp hỏng."},
+        {"role": "user", "content": "Tôi xác nhận tạo ticket với thông tin mới."}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "create_ticket", "args": {"asset_id": "DT-087", "priority": "critical", "confirmed": true}}]},
+      "metadata": {"skill": "multiturn_priority_revision_confirm", "difficulty": "medium", "what_it_tests": "Priority bị đổi ở turn 2 trước khi xác nhận ở turn 3. Agent phải tạo ticket với priority mới (critical), không dùng giá trị medium cũ."}
+    }
+  ]
 }
