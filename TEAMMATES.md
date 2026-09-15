@@ -5,13 +5,13 @@
 Phân công A–E theo lựa chọn của nhóm, sử dụng vai trò của phương án nhóm
 5 người trong slide. Phân vai này không tự chỉ định trưởng nhóm.
 
-| Vai trò | Họ và tên          | MSSV        | GitHub username                                       | Phần việc theo slide  | Công việc phụ trách                                                                                                                                                                                                                   |
-|---------|--------------------|-------------|-------------------------------------------------------|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| A       | Nguyễn Đức Danh    | 2A202602722 | [mysorf-9239](https://github.com/mysorf-9239)         | Prompt                | Rà soát data leakage qua Tavily, kiểm tra ticket phát sinh ngoài ý muốn, kiểm thử 12 adversarial case và phân tích sâu ít nhất 3 case; code 1 bonus tool theo phương án 5 người trong slide (bonus vẫn là phần tùy chọn theo rubric). |
-| B       | Trần Đại Nhân      | 2A202602642 | [hugebenevolence](https://github.com/hugebenevolence) | Tool Schema           | Quản lý `tools.yaml`, chuẩn hóa enums/arguments, đồng bộ tool name và cấu hình Tavily API.                                                                                                                                            |
-| C       | Bùi Gia Chính      | 2A202602693 | [inosukeke](https://github.com/inosukeke)             | Eval Author — G01–G10 | Quản lý `system_prompt.md`, format JSON, context carry-over và version hash.                                                                                                                                                          |
-| D       | Nguyễn Tú Tài      | 2A202602455 | [LonelyStar05](https://github.com/LonelyStar05)       | UI & Report Lead      | Tự viết 10 case trong `eval_group.json` (5 single-turn + 5 multi-turn); chạy và phân tích group eval.                                                                                                                                 |
-| E       | Lê Phan Việt Cường | 2A202602641 | [cuonglpv](https://github.com/cuonglpv)               | Security & Bonus Tool | Dựng Live Chat Streamlit, kiểm thử kịch bản demo, thu transcript/ảnh minh chứng và tổng hợp `REPORT.md`.                                                                                                                              |
+| Vai trò | Họ và tên          | MSSV        | GitHub username                                       | Phần việc theo slide  | Công việc phụ trách                                                                                                 |
+|---------|--------------------|-------------|-------------------------------------------------------|-----------------------|---------------------------------------------------------------------------------------------------------------------|
+| A       | Nguyễn Đức Danh    | 2A202602722 | [mysorf-9239](https://github.com/mysorf-9239)         | Prompt                | Quản lý system_prompt.md, format JSON, context carry-over, kiểm tra nguồn ID và version evidence.                   |
+| B       | Trần Đại Nhân      | 2A202602642 | [hugebenevolence](https://github.com/hugebenevolence) | Tool Schema           | Quản lý tools.yaml, chuẩn hóa enums/arguments, đồng bộ tool name và cấu hình Tavily API.                            |
+| C       | Bùi Gia Chính      | 2A202602693 | [inosukeke](https://github.com/inosukeke)             | Eval Author — G01–G10 | Tự viết 10 case trong eval_group.json (5 single-turn + 5 multi-turn); chạy và phân tích group eval.                 |
+| D       | Nguyễn Tú Tài      | 2A202602455 | [LonelyStar05](https://github.com/LonelyStar05)       | UI & Report Lead      | Dựng Live Chat Streamlit, thu transcript/ảnh demo và tổng hợp REPORT.md.                                            |
+| E       | Lê Phan Việt Cường | 2A202602641 | [cuonglpv](https://github.com/cuonglpv)               | Security & Bonus Tool | Rà soát data leakage, ticket ngoài ý muốn, 12 adversarial case và phân tích sâu ít nhất 3 case; bonus tool nếu làm. |
 
 ## Cách phối hợp
 
@@ -51,23 +51,23 @@ Phân công A–E theo lựa chọn của nhóm, sử dụng vai trò của phư
 Chỉ điền hash/PR thực tế sau khi đóng góp đã được merge vào branch nộp bài.
 Các ô “Chưa cập nhật” không phải xác nhận đã hoàn thành công việc.
 
-| Thành viên         | Commit hash / PR đóng góp | File / artifact liên quan |
-|--------------------|---------------------------|---------------------------|
-| Nguyễn Đức Danh    | Chưa cập nhật             | Chưa cập nhật             |
-| Lê Phan Việt Cường | Chưa cập nhật             | Chưa cập nhật             |
-| Bùi Gia Chính      | Chưa cập nhật             | Chưa cập nhật             |
-| Trần Đại Nhân      | Chưa cập nhật             | Chưa cập nhật             |
-| Nguyễn Tú Tài      | Chưa cập nhật             | Chưa cập nhật             |
+| Thành viên         | Commit hash / PR đóng góp                   | File / artifact liên quan                                                            |
+|--------------------|---------------------------------------------|--------------------------------------------------------------------------------------|
+| Nguyễn Đức Danh    | `3d89875`, `0601d08` (author danhnd)        | system_prompt.md, base runs, version_log.csv                                         |
+| Trần Đại Nhân      | `c09b182` (author hugebenevolence)          | tools.yaml, v2 base run                                                              |
+| Bùi Gia Chính      | `5344fd5` (author HocThoiJCang)             | eval_group.json, hai run v4;                                                         |
+| Nguyễn Tú Tài      | `e8364fb` (author ColdDern)                 | app.py, UI_README.md, requirements.txt                                               |
+| Lê Phan Việt Cường | `7f08d14` (lpvc), merge PR #1 tại `7d3a6d0` | search_device_info/tool.py, smoke_security_bonus.py, lookup_ticket_status và fixture |
 
 ## Checklist của trưởng nhóm trước khi nộp
 
-- [ ] Nhóm đã thống nhất phân công và mọi thành viên truy cập được repo chung.
-- [ ] Prompt, tool declarations và version log đủ `v0`, `v1`, `v2`, `v3`.
-- [ ] Có base runs cho `v0–v3`, 10 case nhóm, group run, extension run và
+- [x] Nhóm đã thống nhất phân công và mọi thành viên truy cập được repo chung.
+- [x] Prompt, tool declarations và version log đủ `v0`, `v1`, `v2`, `v3`.
+- [x] Có base runs cho `v0–v3`, 10 case nhóm, group run, extension run và
   adversarial evidence; đã rà soát đủ 12 security case.
-- [ ] Có Streamlit UI hoạt động, ảnh minh chứng, transcript và report hoàn chỉnh.
-- [ ] Reflection chung và self-reflection của cả 5 thành viên đã hoàn thành.
-- [ ] Commit của cả 5 thành viên đã có trên branch nộp bài; cách merge giữ được
+- [x] Có Streamlit UI hoạt động, ảnh minh chứng, transcript và report hoàn chỉnh.
+- [x] Reflection chung và self-reflection của cả 5 thành viên đã hoàn thành.
+- [x] Commit của cả 5 thành viên đã có trên branch nộp bài; cách merge giữ được
   bằng chứng đóng góp cá nhân; bảng evidence ở trên đã có hash/PR thật.
-- [ ] Repository không chứa secret, dữ liệu thật hoặc file không được nộp.
-- [ ] Cả 5 thành viên đã nhận cùng URL repo và tự nộp trên VLearn.
+- [x] Repository không chứa secret, dữ liệu thật hoặc file không được nộp.
+- [x] Cả 5 thành viên đã nhận cùng URL repo và tự nộp trên VLearn.

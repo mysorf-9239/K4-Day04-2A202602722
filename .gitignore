@@ -18,7 +18,8 @@ starter_v0/tests/
 
 # Local action/scratch output
 /starter_v0/tickets/
-/starter_v0/transcripts/
+/starter_v0/transcripts/*
+!/starter_v0/transcripts/v5_openai_20260915T111548077918.transcript.json
 /starter_v0/analysis/
 
 # OS / editor

@@ -6,5 +6,6 @@ __pycache__/
 .env.*
 !.env.example
 /tickets/
-/transcripts/
+/transcripts/*
+!/transcripts/v5_openai_20260915T111548077918.transcript.json
 /analysis/

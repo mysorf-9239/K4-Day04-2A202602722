@@ -16,6 +16,8 @@ from tools import TOOL_FUNCTIONS
 from tools.lookup_ticket_status.tool import lookup_ticket_status
 from tools.search_device_info.tool import _safe_external_text
 
+EXTERNAL_MODULE = importlib.import_module("tools.search_device_info.tool")
+
 
 def expect(condition: bool, message: str) -> None:
     if not condition:
@@ -25,9 +27,7 @@ def expect(condition: bool, message: str) -> None:
 def main() -> None:
     external = TOOL_FUNCTIONS["search_device_info"]
     # Even with an API key present, rejected input must never reach HTTP.
-    with patch.dict(os.environ, {"TAVILY_API_KEY": "FAKE_OFFLINE_TEST"}), patch(
-        "tools.search_device_info.tool.requests.post"
-    ) as post:
+    with patch.dict(os.environ, {"TAVILY_API_KEY": "FAKE_OFFLINE_TEST"}), patch.object(EXTERNAL_MODULE.requests, "post") as post:
         for suffix in (
             "user@example.test", "2001:db8::1", "HQ Floor 3", "Bangkok floor 3",
             "PF123456", "internal-host.corp", "EMP-1001", "10.0.0.1",
@@ -47,9 +47,7 @@ def main() -> None:
 
     response = Mock()
     response.json.return_value = {"results": []}
-    with patch.dict(os.environ, {"TAVILY_API_KEY": "FAKE_OFFLINE_TEST"}), patch(
-        "tools.search_device_info.tool.requests.post", return_value=response
-    ) as post:
+    with patch.dict(os.environ, {"TAVILY_API_KEY": "FAKE_OFFLINE_TEST"}), patch.object(EXTERNAL_MODULE.requests, "post", return_value=response) as post:
         result = external(" lenovo ", " thinkpad t14 gen 4 ", "drivers", 2)
         expect(not result.get("error"), "approved public identity must work")
         post.assert_called_once()
@@ -116,5 +114,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     # Prevent real network traffic even if a guard regresses in future edits.
-    with patch("tools.search_device_info.tool.requests.post", side_effect=AssertionError("Unexpected network access")):
+    with patch.object(EXTERNAL_MODULE.requests, "post", side_effect=AssertionError("Unexpected network access")):
         main()
